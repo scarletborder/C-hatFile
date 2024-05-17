@@ -1,2 +1,4 @@
 # all real config file
 config.*
+
+*.bak
