@@ -1,6 +1,7 @@
 package auth
 
 import (
+	auth_utils "chatFileBackend/handlers/auth/utils"
 	"fmt"
 	"strconv"
 
@@ -53,9 +54,9 @@ func LoginHandler(c *gin.Context) {
 }
 
 func LoginVerify(username, enc2_pwd string, time_stamp int) bool {
-	real_enc_pwd := sha256Str("!!8964jss")
+	real_enc_pwd := auth_utils.Sha256Str("!!8964jss")
 	// 涉及缓存 username
 
-	real_enc2_pwd := sha256Str(real_enc_pwd + fmt.Sprint(time_stamp))
+	real_enc2_pwd := auth_utils.Sha256Str(real_enc_pwd + fmt.Sprint(time_stamp))
 	return real_enc2_pwd == enc2_pwd
 }

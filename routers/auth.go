@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"chatFileBackend/utils/auth" // 引入Gin框架
+	"chatFileBackend/handlers/auth" // 引入Gin框架
 
 	"github.com/gin-gonic/gin"
 )

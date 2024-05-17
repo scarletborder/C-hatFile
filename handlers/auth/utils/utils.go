@@ -1,11 +1,11 @@
-package auth
+package auth_utils
 
 import (
 	"crypto/sha256"
 	"fmt"
 )
 
-func sha256Str(tok string) string {
+func Sha256Str(tok string) string {
 	// 创建一个新的SHA256哈希对象
 	hash := sha256.New()
 

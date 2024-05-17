@@ -1,7 +1,7 @@
 package auth_test
 
 import (
-	"chatFileBackend/utils/auth"
+	"chatFileBackend/handlers/auth"
 	"testing"
 )
 
