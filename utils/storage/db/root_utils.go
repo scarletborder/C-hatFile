@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // Fallback 至此，在Link时没有命中，root创建相关数据库和用户
@@ -65,7 +66,11 @@ func grantSubDB(s *SubDB, grant_func func(*gorm.DB) error) {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/?charset=utf8mb4&parseTime=True&loc=Local",
 		user, pwd, DBCfg.Addr)
-	s.db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	s.db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		SkipDefaultTransaction:                   false,
+		NamingStrategy:                           schema.NamingStrategy{SingularTable: false},
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		logrus.Errorln("Can not create link to " + s.Cfg.DB_name)
 		return
@@ -81,7 +86,11 @@ func startRootDSN() {
 		DBCfg.RootUser, DBCfg.RootPassword, DBCfg.Addr)
 
 	var err error
-	root_db, err = gorm.Open(mysql.Open(rootDSN), &gorm.Config{})
+	root_db, err = gorm.Open(mysql.Open(rootDSN), &gorm.Config{
+		SkipDefaultTransaction:                   false,
+		NamingStrategy:                           schema.NamingStrategy{SingularTable: false},
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		logrus.Fatalln("Root connection failed:", err)
 		return
@@ -97,7 +106,9 @@ func CloseRootDSN() {
 
 func databaseExists(root_db *gorm.DB, dbname string) (bool, error) {
 	var exists bool
-	query := fmt.Sprintf("SELECT EXISTS(SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '%s')", dbname)
+	query := fmt.Sprintf(
+		"SELECT EXISTS(SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '%s')",
+		dbname)
 	err := root_db.Raw(query).Row().Scan(&exists)
 	return exists, err
 }

@@ -12,6 +12,8 @@ type MetaData struct {
 	Tags       []Tag `gorm:"many2many:metadata_tags;"`
 	UserID     int64 // 上传用户qq号或其他形式的id
 	UploadTime *time.Time
+
+	dirty bool `gorm:"-"` // 忽略这个字段，不写入数据库
 }
 
 /*
@@ -19,10 +21,22 @@ type MetaData struct {
 
 @return 返回对象的存储名称
 */
-func (m MetaData) GenerateObjectName() string {
+func (m *MetaData) GenerateObjectName() string {
 	return fmt.Sprint(m.ID) + "_" + m.Name
 }
 
-func (m MetaData) GetID() uint64 {
+func (m *MetaData) GetID() uint64 {
 	return uint64(m.ID)
+}
+
+func (m *MetaData) GetFeature() string {
+	return fmt.Sprint(m.GetID())
+}
+
+func (m *MetaData) IsDirty() bool {
+	return m.dirty
+}
+
+func (m *MetaData) Dirty() {
+	m.dirty = true
 }

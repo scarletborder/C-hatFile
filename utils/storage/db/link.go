@@ -22,6 +22,7 @@ var (
 // Before get subordinated db, need to create `SubDB.db“ first
 func (s *SubDB) CreateSubDB(grant_func func(*gorm.DB) error) {
 	// once, 设置gorm.DB
+	DBReadConfigWG.Wait()
 	grantSubDB(s, grant_func)
 }
 

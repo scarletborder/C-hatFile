@@ -2,10 +2,14 @@ package auth
 
 import (
 	auth_utils "chatFileBackend/handlers/auth/utils"
+	"chatFileBackend/models"
+	cached "chatFileBackend/utils/storage/cache"
+	"chatFileBackend/utils/storage/db"
 	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func LoginHandler(c *gin.Context) {
@@ -53,10 +57,28 @@ func LoginHandler(c *gin.Context) {
 	}
 }
 
+// @param enc2_pwd 传来的经过sha256后拼接时间戳盐再sha256的结果
 func LoginVerify(username, enc2_pwd string, time_stamp int) bool {
-	real_enc_pwd := auth_utils.Sha256Str("!!8964jss")
-	// 涉及缓存 username
-
+	real_enc_pwd := getEncPwd(username)
 	real_enc2_pwd := auth_utils.Sha256Str(real_enc_pwd + fmt.Sprint(time_stamp))
 	return real_enc2_pwd == enc2_pwd
+}
+
+// 获得一次sha256
+func getEncPwd(username string) (enc_pwd string) {
+	var user models.User
+	ok, err := cached.CacheGetByStr(username, &user)
+	if err != nil {
+		logrus.Warnln("无法从缓存中获取，Fallback至DB")
+	}
+	if !ok {
+		adb := db.Auth_db.GetDB()
+		adb.AutoMigrate(&models.User{})
+		user.Username = username
+		adb.Take(&user)
+		return user.Enc_password
+
+	} else {
+		return user.Enc_password
+	}
 }
