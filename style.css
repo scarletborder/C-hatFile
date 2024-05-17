@@ -1,0 +1,83 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+header {
+    padding: 10px;
+    width: 100%;
+}
+
+.top-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+#loginContainer {
+    width: 100%;
+    margin-top: 10px;
+}
+
+#loginContainer input,
+#loginContainer button {
+    width: 90%;
+    /* 略小于容器宽度以留出一些边距 */
+    padding: 12px;
+    /* 增加填充以便于触控 */
+    margin: 5px 5%;
+    /* 居中对齐 */
+}
+
+header nav {
+    width: 100%;
+    margin-top: 20px;
+}
+
+header nav a {
+    padding: 10px;
+    display: inline-block;
+    /* 确保链接易于点击 */
+}
+
+@media (min-width: 600px) {
+    .top-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    header h1,
+    #loginContainer,
+    header nav {
+        text-align: left;
+    }
+
+    #loginContainer {
+        flex-grow: 0;
+        width: auto;
+        margin-top: 0;
+    }
+
+    #loginContainer input,
+    #loginContainer button {
+        width: auto;
+        padding: 8px;
+        margin: 0 2px;
+        /* 较小的外边距 */
+    }
+}

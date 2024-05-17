@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Advanced Web Page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 50px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .login-container input {
+            margin-bottom: 5px;
+        }
+
+        nav {
+            margin-top: 20px;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>My Web Application</h1>
+        <div class="login-container" id="loginContainer">
+            <div>
+                <input type="text" id="username" placeholder="Username"><br>
+                <input type="password" id="password" placeholder="Password"><br>
+            </div>
+            <button onclick="login()">Login</button>
+        </div>
+    </header>
+    <nav>
+        <a href="#about">About Website</a> |
+        <a href="#search">Search</a>
+    </nav>
+    <div id="content">
+        <div id="about" style="display: none;">
+            <h2>About this Website</h2>
+            <p>This website is designed to demonstrate web programming.</p>
+        </div>
+        <div id="search" style="display: none;">
+            <h2>Search</h2>
+            <input type="text" id="searchTitle" placeholder="Title">
+            <input type="text" id="searchTag" placeholder="Tag">
+            <button onclick="performSearch()">Search</button>
+            <ul id="results"></ul>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            if (password === '123456') {
+                document.cookie = "token=123abc; path=/";
+                document.getElementById('loginContainer').innerHTML =
+                    `<span>Welcome, ${username}!</span>
+                     <button onclick="logout()">Logout</button>`;
+                alert('Login successful');
+            } else {
+                alert('Password incorrect');
+            }
+        }
+
+        function logout() {
+            document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.getElementById('loginContainer').innerHTML =
+                `<div>
+                    <input type="text" id="username" placeholder="Username"><br>
+                    <input type="password" id="password" placeholder="Password"><br>
+                </div>
+                <button onclick="login()">Login</button>`;
+        }
+
+        function performSearch() {
+            if (!document.cookie.includes('token=')) {
+                alert('Please log in first.');
+                return;
+            }
+            var title = document.getElementById('searchTitle').value;
+            var tag = document.getElementById('searchTag').value;
+            var results = [];
+            for (let i = 1; i <= 5; i++) {
+                results.push({
+                    title: title + i,
+                    url: "abc.com",
+                    tags: [tag]
+                });
+            }
+            var resultList = document.getElementById('results');
+            resultList.innerHTML = '';
+            results.forEach(function (result) {
+                var li = document.createElement('li');
+                li.innerHTML = `Title: ${result.title}, URL: <a href="${result.url}">${result.url}</a>, Tags: ${result.tags.join(', ')}`;
+                resultList.appendChild(li);
+            });
+        }
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                var sections = document.querySelectorAll('#content > div');
+                sections.forEach(section => section.style.display = 'none');
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

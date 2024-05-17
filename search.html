@@ -1,0 +1,66 @@
+<div id="search">
+    <h2>Search</h2>
+    <div id="searchForm">
+        <input type="text" id="searchTitle" placeholder="Title">
+        <input type="text" id="searchTag" placeholder="Tag">
+        <button onclick="startSearch()">Search</button>
+    </div>
+    <ul id="results"></ul>
+    <div id="pagination"></div>
+    <div id="totalPagesInfo"></div> <!-- 新增的显示总页数的div -->
+</div>
+
+<style>
+    #search {
+        text-align: center;
+        padding: 20px;
+        width: 100%;
+    }
+
+    #searchForm input[type="text"],
+    #searchForm button {
+        width: 90%;
+        padding: 10px;
+        margin: 10px auto;
+        display: block;
+    }
+
+    #searchForm button {
+        cursor: pointer;
+        background-color: #d6d6d7;
+        color: rgb(0, 0, 0);
+        border: none;
+        border-radius: 5px;
+    }
+
+    #results {
+        text-align: left;
+        width: 100%;
+        list-style: none;
+        padding: 0;
+    }
+
+    #pagination {
+        text-align: left;
+        padding: 10px 0;
+    }
+
+    #pagination button {
+        padding: 5px 10px;
+        margin-right: 5px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #pagination button:last-child {
+        margin-right: 0;
+    }
+
+    #pagination button:disabled {
+        background-color: #dcdcdc;
+        color: #888;
+        cursor: default;
+    }
+</style>

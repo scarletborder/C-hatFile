@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Web Application</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+
+<body>
+    <div id="header"></div>
+    <div id="content"></div>
+
+    <script src="header.js"></script>
+    <script src="login.js"></script>
+    <script>
+        var once = true;
+        function loadHTML(url, id) {
+            fetch(url).then(function (response) {
+                return response.text();
+            }).then(function (html) {
+                document.getElementById(id).innerHTML = html;
+                if (url === 'search.html' && once) {
+                    // Load search.js only when search.html is loaded
+                    const script = document.createElement('script');
+                    script.src = 'search.js';
+                    document.body.appendChild(script);
+
+                    once = false;
+                }
+            }).catch(function (err) {
+                console.warn('Something went wrong.', err);
+            });
+        }
+
+        loadHTML('header.html', 'header');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('header').addEventListener('navChange', (e) => {
+                loadHTML(`${e.detail}.html`, 'content');
+            });
+        });
+    </script>
+</body>
+
+</html>
