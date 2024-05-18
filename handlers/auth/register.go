@@ -30,8 +30,7 @@ func RegisterHandler(c *gin.Context) {
 
 	// 检查数据库中是否存在具有指定名称的用户
 	var count int64
-	nameToCheck := "exampleName"
-	adb.Model(&models.User{}).Where("name = ?", nameToCheck).Count(&count)
+	adb.Model(&models.User{}).Where("username = ?", username).Count(&count)
 
 	if count > 0 {
 		c.JSON(406, gin.H{
@@ -46,8 +45,9 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	auth_utils.UpdateAccount(models.User{Username: username,
-		Enc_password: enc_pwd})
+	new_user := &models.User{Username: username, Enc_password: enc_pwd}
+	new_user.SetDirty() // 立即写入数据库中
+	auth_utils.UpdateAccount(new_user)
 
 	c.JSON(200, gin.H{
 		"message": "successfully register your account"})

@@ -9,8 +9,8 @@ type DBConfig struct {
 	SubDBCfgs SubDBConfigs `toml:"database"` // db名-验证用户，仅管理非客户
 
 	Addr         string
-	RootUser     string `toml:root_user`
-	RootPassword string `toml:root_password`
+	RootUser     string `toml:"root_user"`
+	RootPassword string `toml:"root_password"`
 }
 
 type SubDBConfigs struct {

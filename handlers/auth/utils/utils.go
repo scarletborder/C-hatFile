@@ -20,6 +20,6 @@ func Sha256Str(tok string) string {
 }
 
 // 由修改密码或注册账号引发
-func UpdateAccount(user models.User) {
+func UpdateAccount(user *models.User) {
 	cached.CacheSetByStr(cached.TypeAuthCache, user)
 }

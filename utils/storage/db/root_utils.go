@@ -25,7 +25,7 @@ func init() {
 // 保证存在对应子db
 func grantSubDB(s *SubDB, grant_func func(*gorm.DB) error) {
 	// 到达fallback最底层，创建所需数据库和用户
-	root_once.Do(func() {
+	go root_once.Do(func() {
 		startRootDSN()
 	})
 	root_link_wg.Wait()
@@ -37,7 +37,7 @@ func grantSubDB(s *SubDB, grant_func func(*gorm.DB) error) {
 		return
 	}
 	if !exists {
-		logrus.Warnln("Database:" + s.Cfg.DB_name + "not exists, create first")
+		logrus.Warnln("Database:" + s.Cfg.DB_name + " not exists, create first")
 		err = databaseCreate(root_db, s.Cfg.DB_name)
 		if err != nil {
 			logrus.Errorln("Error create database "+
@@ -54,7 +54,7 @@ func grantSubDB(s *SubDB, grant_func func(*gorm.DB) error) {
 		return
 	}
 	if !exists {
-		logrus.Warnln("user:" + user + "not exists, create first")
+		logrus.Warnln("user:" + user + " not exists, create first")
 		// 创建账号
 		err = userCreate(root_db, s.Cfg, grant_func)
 		if err != nil {
@@ -64,8 +64,8 @@ func grantSubDB(s *SubDB, grant_func func(*gorm.DB) error) {
 		}
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/?charset=utf8mb4&parseTime=True&loc=Local",
-		user, pwd, DBCfg.Addr)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		user, pwd, DBCfg.Addr, s.Cfg.DB_name)
 	s.db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction:                   false,
 		NamingStrategy:                           schema.NamingStrategy{SingularTable: false},

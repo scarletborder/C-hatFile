@@ -6,7 +6,7 @@ type Tag struct {
 	ID    uint `gorm:"primaryKey;auto_increment;"`
 	Title string
 
-	dirty bool `gorm:"-"` // 忽略这个字段，不写入数据库
+	Dirty bool `gorm:"-"` // 忽略这个字段，不写入数据库
 }
 
 func (t *Tag) GetID() uint64 {
@@ -18,9 +18,13 @@ func (t *Tag) GetFeature() string {
 }
 
 func (t *Tag) IsDirty() bool {
-	return t.dirty
+	return t.Dirty
 }
 
-func (t *Tag) Dirty() {
-	t.dirty = true
+func (t *Tag) SetDirty() {
+	t.Dirty = true
+}
+
+func (t *Tag) FlushDirty() {
+	t.Dirty = false
 }

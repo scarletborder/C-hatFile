@@ -33,24 +33,32 @@ func LoginHandler(c *gin.Context) {
 			"message": "need arg encrypted_pwd"})
 		return
 	}
-	time_stamp, ok := c.GetPostForm("time_stamp")
+	time_stamp_str, ok := c.GetPostForm("time_stamp")
 	if !ok {
 		c.JSON(501, gin.H{
 			"message": "need arg time_stamp"})
 		return
 	}
-	timestamp, err := strconv.Atoi(time_stamp)
+	timestamp, err := strconv.Atoi(time_stamp_str)
 	if err != nil {
 		c.JSON(501, gin.H{
 			"message": "time_stamp must be integer"})
 		return
 
 	}
-	if LoginVerify(username, enc2_pwd, timestamp) {
-		// 发回token
+	if ok, lev := LoginVerify(username, enc2_pwd, timestamp); ok {
+		// 登录成功
+		token, exp_time, err := auth_utils.GenerateToken(username, enc2_pwd, lev)
+		if err != nil {
+			c.JSON(500, gin.H{
+				"message": "Login succeed, but crash in generating token"})
+			return
+		}
+
 		c.JSON(200, gin.H{
-			"token":   "123abc",
-			"message": "success"})
+			"token":        token,
+			"message":      "success",
+			"expire_stamp": exp_time.Unix()})
 	} else {
 		c.JSON(401, gin.H{
 			"message": "password is incorrect, or username doesn't exist"})
@@ -58,27 +66,30 @@ func LoginHandler(c *gin.Context) {
 }
 
 // @param enc2_pwd 传来的经过sha256后拼接时间戳盐再sha256的结果
-func LoginVerify(username, enc2_pwd string, time_stamp int) bool {
-	real_enc_pwd := getEncPwd(username)
+func LoginVerify(username, enc2_pwd string, time_stamp int) (bool, uint8) {
+	real_enc_pwd, level := getEncPwd(username)
 	real_enc2_pwd := auth_utils.Sha256Str(real_enc_pwd + fmt.Sprint(time_stamp))
-	return real_enc2_pwd == enc2_pwd
+	return real_enc2_pwd == enc2_pwd, level
 }
 
 // 获得一次sha256
-func getEncPwd(username string) (enc_pwd string) {
+func getEncPwd(username string) (enc_pwd string, level uint8) {
 	var user models.User
-	ok, err := cached.CacheGetByStr(username, &user)
+	user.Username = username
+	user.FlushDirty()
+
+	ok, err := cached.CacheGetByStr(cached.TypeAuthCache, &user)
 	if err != nil {
 		logrus.Warnln("无法从缓存中获取，Fallback至DB")
 	}
 	if !ok {
 		adb := db.Auth_db.GetDB()
 		adb.AutoMigrate(&models.User{})
-		user.Username = username
-		adb.Take(&user)
-		return user.Enc_password
+		adb.Where("username = ?", username).Take(&user)
+		cached.CacheSetByStr(cached.TypeAuthCache, &user)
+		return user.Enc_password, user.Level
 
 	} else {
-		return user.Enc_password
+		return user.Enc_password, user.Level
 	}
 }

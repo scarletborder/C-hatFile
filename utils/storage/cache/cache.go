@@ -8,15 +8,25 @@ import (
 	cache "github.com/patrickmn/go-cache"
 )
 
-var cacheMaps = make(map[string]*cache.Cache)
+var (
+	cacheMaps = make(map[string]*cache.Cache)
+	m         = new(sync.Mutex)
 
-var m = new(sync.Mutex)
+	// time settings
+	Expired_time  = 5 * time.Minute
+	Sync_interval = 10 * time.Second
+)
 
 type cachedItem interface {
-	GetID() uint64      // 获得唯一后缀字符串
+	SetDirty() // 标记进行修改
+
+	FlushDirty()
+
+	GetID() uint64 // 获得唯一后缀字符串
+
 	GetFeature() string // 特征字符串
-	IsDirty() bool      // 是否被修改
-	Dirty()             // 标记进行修改
+
+	IsDirty() bool // 是否被修改
 }
 
 func id2Str(id uint64) string {
@@ -32,7 +42,7 @@ func GetOrCreateCache(name string) *cache.Cache {
 		defer m.Unlock()
 		cc, ok := cacheMaps[name]
 		if !ok {
-			cc = cache.New(5*time.Minute, 10*time.Minute)
+			cc = cache.New(Expired_time, 10*time.Minute)
 			cacheMaps[name] = cc
 			return cc
 		}

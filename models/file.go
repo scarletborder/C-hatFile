@@ -13,7 +13,7 @@ type MetaData struct {
 	UserID     int64 // 上传用户qq号或其他形式的id
 	UploadTime *time.Time
 
-	dirty bool `gorm:"-"` // 忽略这个字段，不写入数据库
+	Dirty bool `gorm:"-"` // 忽略这个字段，不写入数据库
 }
 
 /*
@@ -34,9 +34,13 @@ func (m *MetaData) GetFeature() string {
 }
 
 func (m *MetaData) IsDirty() bool {
-	return m.dirty
+	return m.Dirty
 }
 
-func (m *MetaData) Dirty() {
-	m.dirty = true
+func (m *MetaData) SetDirty() {
+	m.Dirty = true
+}
+
+func (m *MetaData) FlushDirty() {
+	m.Dirty = false
 }

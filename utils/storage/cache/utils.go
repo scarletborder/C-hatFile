@@ -24,9 +24,10 @@ func CacheGet(key string, obj interface{}) (bool, error) {
 
 	key = key + id2Str(wrappedObj.GetID()) // cache的key
 	if val, found := c.Get(key); found {
-		c.Set(key, val, 5*time.Minute)
+		c.Set(key, val, Expired_time)
 		dstVal := reflect.ValueOf(obj)
-		dstVal.Elem().Set(reflect.ValueOf(val))
+		// dstVal.Elem().Set(reflect.ValueOf(val))
+		dstVal.Elem().Set(reflect.ValueOf(reflect.ValueOf(val).Elem()))
 		return true, nil
 	}
 	// 缓存没有命中
@@ -49,9 +50,10 @@ func CacheGetByStr(key string, obj interface{}) (bool, error) {
 	wrappedObj := obj.(cachedItem)
 	key = key + wrappedObj.GetFeature()
 	if val, found := c.Get(key); found {
-		c.Set(key, val, 6*time.Minute)
+		c.Set(key, val, Expired_time)
 		dstVal := reflect.ValueOf(obj)
-		dstVal.Elem().Set(reflect.ValueOf(val))
+		valElem := reflect.ValueOf(val).Elem()
+		dstVal.Elem().Set(valElem)
 		return true, nil
 	}
 	// 缓存没有命中
@@ -62,32 +64,32 @@ func CacheGetByStr(key string, obj interface{}) (bool, error) {
 //
 // 一般Fallback到db后设置某cacheditem
 //
-// @param obj 值传递
+// @param obj 指针
 func CacheSet(key string, obj interface{}) {
 	c := GetOrCreateCache(key)
 	wrappedObj := obj.(cachedItem)
 
 	key = key + id2Str(wrappedObj.GetID()) // 真key
 	if _, find := c.Get(key); find {
-		wrappedObj.Dirty()
+		wrappedObj.SetDirty()
 	}
-	c.Set(key, wrappedObj, 6*time.Minute)
+	c.Set(key, wrappedObj, Expired_time)
 }
 
 // CacheSetByStr
 //
 // 一般Fallback到db后设置某cacheditem
 //
-// @param obj 值传递
+// @param obj 示例：user *models.User
 func CacheSetByStr(key string, obj interface{}) {
 	c := GetOrCreateCache(key)
 	wrappedObj := obj.(cachedItem)
 
 	key = key + wrappedObj.GetFeature() // 真key
 	if _, find := c.Get(key); find {
-		wrappedObj.Dirty()
+		wrappedObj.SetDirty()
 	}
-	c.Set(key, wrappedObj, 6*time.Minute)
+	c.Set(key, wrappedObj, Expired_time)
 }
 
 // StartDBSync
@@ -106,6 +108,7 @@ func StartDBSync(key string, sync_handler func(chunk []interface{}) error, t tim
 
 			for _, v := range items {
 				if cv, ok := v.Object.(cachedItem); ok && cv.IsDirty() {
+					cv.FlushDirty()
 					item_slice = append(item_slice, v.Object)
 				}
 			}
@@ -116,6 +119,7 @@ func StartDBSync(key string, sync_handler func(chunk []interface{}) error, t tim
 					logrus.Errorln("sync error in ", key)
 				}
 			}()
+			daemon.Reset(Sync_interval) // continue
 
 			// err := sync_fn
 			// if err != nil {
