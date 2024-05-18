@@ -10,5 +10,6 @@ func CreateAuthRouter(engine *gin.Engine) {
 	auth_router := engine.Group("auth")
 	{
 		auth_router.POST("/login", auth.LoginHandler)
+		auth_router.POST("/register", auth.RegisterHandler)
 	}
 }
