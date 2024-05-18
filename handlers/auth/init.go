@@ -47,7 +47,7 @@ func syncHandler(chunk []interface{}) error {
 func grantHandler(rdb *gorm.DB) error {
 	// 只需要保证读写auth_db的user表权限
 	res := rdb.Exec(fmt.Sprintf(
-		"GRANT CREATE, SELECT, INSERT, UPDATE, DELETE ON %s.* TO '%s'@'%%'",
+		"GRANT CREATE, SELECT, INSERT, UPDATE, DELETE, ALTER, INDEX, EXECUTE ON %s.* TO '%s'@'%%'",
 		db.Auth_db.Cfg.DB_name, db.GetDBUserName(db.Auth_db.Cfg.DB_name)))
 	return res.Error
 }

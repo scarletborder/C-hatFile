@@ -2,3 +2,9 @@
 config.*
 
 *.bak
+
+*.exe
+
+chatFileBackend.*
+
+chatFileBackend

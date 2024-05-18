@@ -7,6 +7,7 @@ import (
 	"chatFileBackend/utils/storage/db"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -58,7 +59,7 @@ func LoginHandler(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"token":        token,
 			"message":      "success",
-			"expire_stamp": exp_time.Unix()})
+			"expire_stamp": exp_time.UnixNano() / int64(time.Millisecond)})
 	} else {
 		c.JSON(401, gin.H{
 			"message": "password is incorrect, or username doesn't exist"})
