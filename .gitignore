@@ -1,10 +1,11 @@
 # all real config file
 config.*
 
+# all bak
 *.bak
 
+
+# all exe
 *.exe
 
 chatFileBackend.*
-
-chatFileBackend
