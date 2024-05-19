@@ -11,21 +11,57 @@ function updateResults(results) {
 
 
 function startSearch() {
+    var token = getCookie("token")
     var title = document.getElementById('searchTitle').value;
     var tag = document.getElementById('searchTag').value;
 
-    // 模拟搜索结果
-    var results = [];
-    for (let i = 0; i < 123; i++) {
-        results.push({
-            title: title + " Result " + (i + 1),
-            url: "http://example.com",
-            tags: [tag]
-        });
+    if (title == "" && tag == "") {
+        alert("Need at least one argument");
+        return;
+    }
+    let url = `api/search/search?`
+
+    if (title != "") {
+        url += `title=${title}`
+        if (tag != "") {
+            url += `&tags=${tag}`
+        }
+    } else if (tag != "") {
+        url += `tags=${tag}`
     }
 
-    localStorage.setItem('searchResults', JSON.stringify(results)); // 在localStorage中存储results
-    performSearch();
+
+
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+    }).then(data => {
+        var results = data.results;
+
+        // 模拟搜索结果
+        // for (let i = 0; i < 123; i++) {
+        //     results.push({
+        //         title: title + " Result " + (i + 1),
+        //         url: "http://example.com",
+        //         tags: [tag]
+        //     });
+        // }
+
+        localStorage.setItem('searchResults', JSON.stringify(results)); // 在localStorage中存储results
+        performSearch();
+        // console.log('Success:', data);
+    }).catch(error => {
+        alert('Error:', error);
+    });
 }
 
 

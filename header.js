@@ -26,8 +26,7 @@ function setLoginCookie(username, token, expire_stamp) {
 
 
 function updateLoginUI(username) {
-    document.getElementById('loginContainer').innerHTML = `<span>Welcome, ${username}!</span>
-         <button onclick="logout()">Logout</button>`;
+    ChangeToHelloContainer(username);
 }
 function changeContent(page) {
     const event = new CustomEvent('navChange', { detail: page });
@@ -69,5 +68,6 @@ function getCookie(name) {
 function logout() {
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     localStorage.removeItem('tokenExpires'); // Clear the stored expires time
+    localStorage.removeItem("username");
     loadHTML('header.html', 'header'); // Reload login form or redirect
 }
