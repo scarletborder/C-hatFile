@@ -1,14 +1,65 @@
-<div id="search">
-    <h2>Search</h2>
-    <div id="searchForm">
-        <input type="text" id="searchTitle" placeholder="Title">
-        <input type="text" id="searchTag" placeholder="Tag">
-        <button onclick="startSearch()">Search</button>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script>
+<script src="header.js"></script>
+<script src="login.js"></script>
+<script src="search.js"></script>
+
+<body>
+    <div id="header-container"></div>
+    <div id="content-container">
+        <div class="txt_page">
+            <h2>Search</h2>
+            <p>You can query resources by their partial title or partial tags.</p>
+        </div>
+
+        <div id="search">
+            <h2>Search</h2>
+            <div id="searchForm">
+                <input type="text" id="searchTitle" placeholder="Title">
+                <input type="text" id="searchTag" placeholder="Tag">
+                <button onclick="startSearch()">Search</button>
+            </div>
+            <ul id="results"></ul>
+            <div id="pagination"></div>
+            <div id="totalPagesInfo"></div> <!-- 新增的显示总页数的div -->
+        </div>
     </div>
-    <ul id="results"></ul>
-    <div id="pagination"></div>
-    <div id="totalPagesInfo"></div> <!-- 新增的显示总页数的div -->
-</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            loadHeader();
+        });
+
+        function loadHeader() {
+            fetch('header.html')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('header-container').innerHTML = html;
+                    // 初始化header中可能需要的任何JavaScript
+                    // initializeHeader();
+                })
+                .catch(error => {
+                    console.error('Failed to load the header:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>
+
+
+
 
 <style>
     #search {

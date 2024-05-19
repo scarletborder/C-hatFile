@@ -23,7 +23,7 @@ async function register() {
         encodeURIComponent(key) + '=' + encodeURIComponent(data[key])
     ).join('&');
 
-    fetch("api/auth/register", {
+    fetch("/api/auth/register", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -58,7 +58,7 @@ async function loginRequest(username, encrypted_pwd, time_stamp) {
         encodeURIComponent(key) + '=' + encodeURIComponent(data[key])
     ).join('&');
 
-    fetch("api/auth/login", {
+    fetch("/api/auth/login", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'

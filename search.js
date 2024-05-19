@@ -19,7 +19,7 @@ function startSearch() {
         alert("Need at least one argument");
         return;
     }
-    let url = `api/search/search?`
+    let url = `/api/search/search?`
 
     if (title != "") {
         url += `title=${title}`
@@ -46,6 +46,10 @@ function startSearch() {
         return response.json();
     }).then(data => {
         var results = data.results;
+        if (!results) {
+            alert("No results");
+            return;
+        }
 
         // 模拟搜索结果
         // for (let i = 0; i < 123; i++) {

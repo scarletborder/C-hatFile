@@ -3,7 +3,7 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Web Application</title>
+    <title>Upload</title>
     <link rel="stylesheet" type="text/css" href="style.css">
 
 </head>
@@ -12,12 +12,23 @@
 <script src="header.js"></script>
 <script src="login.js"></script>
 
+
+
 <body>
     <div id="header-container"></div>
     <div id="content-container">
         <div class="txt_page">
-            <h2>About this Website</h2>
-            <p>This website is designed to demonstrate web programming.</p>
+            <h2>Upload</h2>
+            <p>Choose file you want to send.</p>
+        </div>
+
+        <div>
+            <form id="uploadForm">
+                <input type="file" id="fileInput" name="file" placeholder="file">
+                <input type="text" id="textInput" name="text" placeholder="tags">
+                <button type="submit">Upload</button>
+            </form>
+
         </div>
     </div>
 
@@ -40,5 +51,6 @@
         }
     </script>
 </body>
+<script src="upload.js"></script>
 
 </html>

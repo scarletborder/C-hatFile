@@ -66,8 +66,22 @@ function getCookie(name) {
 }
 
 function logout() {
-    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
+    if (keys) {
+        for (var i = keys.length; i--;)
+            document.cookie = keys[i] + '=0;expires=' + new Date(0).toUTCString()
+    }
     localStorage.removeItem('tokenExpires'); // Clear the stored expires time
     localStorage.removeItem("username");
-    loadHTML('header.html', 'header'); // Reload login form or redirect
+
+    fetch('header.html')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('header-container').innerHTML = html;
+            // 初始化header中可能需要的任何JavaScript
+            // initializeHeader();
+        })
+        .catch(error => {
+            console.error('Failed to load the header:', error);
+        });
 }
