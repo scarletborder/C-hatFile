@@ -14,7 +14,7 @@ var (
 
 	// time settings
 	Expired_time  = 5 * time.Minute
-	Sync_interval = 10 * time.Second
+	Sync_interval = 6 * time.Second
 )
 
 type cachedItem interface {

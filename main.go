@@ -21,6 +21,7 @@ func main() {
 	routers.CreateSearchRouter(r)
 	routers.CreateUploadRouter(r)
 	routers.CreateDownloadRouter(r)
+	routers.CreateStatRouter(r)
 
 	r.Run("0.0.0.0:12800")
 }

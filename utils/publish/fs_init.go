@@ -17,6 +17,7 @@ var (
 	fs_storage_db_name = "fs_storage"
 	Reader_DB          *gorm.DB
 	Writer_DB          *gorm.DB
+	// wg                 sync.WaitGroup
 )
 
 // upload, search共用初始数据库方法
