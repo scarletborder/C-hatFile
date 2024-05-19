@@ -2,10 +2,12 @@ package chats3
 
 import (
 	"chatFileBackend/models"
+	"context"
 	"errors"
 	"fmt"
 	"io"
 
+	"github.com/minio/minio-go/v7"
 	"github.com/sirupsen/logrus"
 )
 
@@ -34,6 +36,24 @@ func Get_download_url(meta *models.MetaData) (string, error) {
 		logrus.Errorf("failed download from %v :%v", s3p.EndPoint, err.Error())
 	}
 	return "All s3points failed to download file", errors.New("all s3points failed to download file")
+}
+
+func GetDownlodReader(meta *models.MetaData) (io.Reader, int64, error) {
+	return GetDownlodReaderByObjectName(meta.GenerateObjectName())
+}
+
+func GetDownlodReaderByObjectName(obj_name string) (io.Reader, int64, error) {
+	for _, s3p := range s3points {
+		r, err := s3p.DownloadReaderByObjectName(bucket_name, obj_name)
+		if err == nil {
+			obj_info, _ := s3p.Point.StatObject(context.Background(),
+				bucket_name, obj_name,
+				minio.StatObjectOptions{})
+
+			return r, obj_info.Size, nil
+		}
+	}
+	return nil, 0, errors.New("no such file " + obj_name)
 }
 
 // func Get_download_url_by_fnv(fnv, file_name string) (string, error) {

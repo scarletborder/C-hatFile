@@ -35,6 +35,7 @@ func SearchHandler(c *gin.Context) {
 
 	// 模拟搜索
 	tags := publish_utils.Str2Tags(tags_str)
+
 	var results []SearchResult = search(title_str, tags)
 
 	// for i := 0; i < 100; i += 1 {

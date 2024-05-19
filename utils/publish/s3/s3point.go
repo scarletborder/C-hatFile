@@ -70,8 +70,14 @@ func (s3p S3Point) downloadURL(bucket_name string, meta *models.MetaData) (strin
 }
 
 // 返回下载流或错误
-func (s3p S3Point) downloadReader(bucket_name string, meta models.MetaData) (io.Reader, error) {
+func (s3p S3Point) DownloadReader(bucket_name string, meta models.MetaData) (io.Reader, error) {
 	reader, err := s3p.Point.GetObject(context.Background(), bucket_name,
 		meta.GenerateObjectName(), minio.GetObjectOptions{})
+	return reader, err
+}
+
+func (s3p S3Point) DownloadReaderByObjectName(bucket_name, obj_name string) (io.Reader, error) {
+	reader, err := s3p.Point.GetObject(context.Background(), bucket_name,
+		obj_name, minio.GetObjectOptions{})
 	return reader, err
 }
