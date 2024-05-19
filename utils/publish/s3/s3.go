@@ -10,10 +10,9 @@ import (
 )
 
 var (
-	s3points []S3Point
+	s3points    []S3Point
+	bucket_name string
 )
-
-const bucket_name = "chatfile"
 
 func Upload_file(reader io.Reader, meta *models.MetaData) (string, error) {
 	for _, s3p := range s3points {

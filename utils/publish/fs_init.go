@@ -124,7 +124,7 @@ func grantHandler(rdb *gorm.DB) error {
 
 	// reader
 	res = rdb.Exec(fmt.Sprintf(
-		"GRANT SELECT, ALTER, INDEX, EXECUTE ON %s.* TO '%s'@'%%'",
+		"GRANT CREATE, SELECT, ALTER, INDEX, EXECUTE ON %s.* TO '%s'@'%%'",
 		fs_storage_db_name, db.DBCfg.SubDBCfgs.FileReaderDB.Username))
 	return res.Error
 }

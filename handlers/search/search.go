@@ -11,6 +11,8 @@ func search(title string, tags []string) (res []SearchResult) {
 	Db := publish.Reader_DB
 	var metadatas []models.MetaData
 
+	Db.AutoMigrate(&models.Tag{}, &models.MetaData{})
+
 	query := Db.Preload("Tags").Model(&models.MetaData{})
 
 	title = strings.TrimSpace(title)

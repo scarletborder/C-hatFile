@@ -20,6 +20,8 @@ func UploadDocument(file io.Reader, meta *models.MetaData) (msg string, err erro
 	if err != nil {
 		// 如果对象存储不行，删除db相关line
 		Writer_DB.Delete(&models.MetaData{}, metaID)
+		// 删除连接表
+		Writer_DB.Table("metadata_tags").Where("meta_data_id = ?", metaID).Delete(nil)
 		return
 	}
 

@@ -1,6 +1,7 @@
 package chats3
 
 import (
+	"chatFileBackend/utils/global"
 	"encoding/json"
 	"os"
 
@@ -17,13 +18,15 @@ func init() {
 	// 初始化数据库和加入相关项目
 
 	// 初始化对象存储
-	cfg_content, err := os.ReadFile("utils/publish/config.json")
-	if err != nil {
-		logrus.Errorln("无法加载s3配置", err.Error())
-	}
-	json_str := string(cfg_content)
+	global.Init_count.Add(1)
 
 	go func() {
+		cfg_content, err := os.ReadFile("utils/publish/config.json")
+		if err != nil {
+			logrus.Errorln("无法加载s3配置", err.Error())
+		}
+		json_str := string(cfg_content)
+
 		// 加载s3节点配置
 		value := gjson.Get(json_str, "s3_points")
 		if !value.Exists() {
@@ -32,7 +35,7 @@ func init() {
 		}
 
 		var pre_s3Points []S3Point
-		err = json.Unmarshal([]byte(value.String()), &pre_s3Points)
+		err = json.Unmarshal([]byte(value.Raw), &pre_s3Points)
 		if err != nil {
 			logrus.Errorln("无法解析s3配置:节点信息", err.Error())
 			return
@@ -53,10 +56,10 @@ func init() {
 
 		// 加载存储桶配置
 		value = gjson.Get(json_str, "bucket_name")
-		var bucket_name string
+		// var bucket_name string
 		if !value.Exists() {
-			logrus.Warnln("无法加载s3配置:桶名称，使用cf_files替代", err.Error())
-			bucket_name = "cf_files"
+			logrus.Warnln("无法加载s3配置:桶名称，使用cffiles替代", err)
+			bucket_name = "cffiles"
 		} else {
 			bucket_name = value.String()
 		}
@@ -67,5 +70,7 @@ func init() {
 				point.MakeBucket(bucket_name)
 			}
 		}
+
+		global.Init_count.Done()
 	}()
 }

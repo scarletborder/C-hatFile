@@ -3,6 +3,7 @@ package upload
 import (
 	"chatFileBackend/handlers/upload/upload_utils"
 	"chatFileBackend/models"
+	"chatFileBackend/utils/publish"
 	publish_utils "chatFileBackend/utils/publish/utils"
 	"net/http"
 
@@ -22,9 +23,13 @@ func UploadHandler(c *gin.Context) {
 		return
 	}
 
+	// debug
+	// bb, _ := io.ReadAll(c.Request.Body)
+	// fmt.Println(string(bb))
+
 	// 获取表单中的字符串
-	tags_str := c.PostForm("tags")
-	if tags_str == "" {
+	tags_str, ok := c.GetPostForm("tags")
+	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "tags field is required"})
 		return
 	}
@@ -47,7 +52,7 @@ func UploadHandler(c *gin.Context) {
 	tags_str_arr := publish_utils.Str2Tags(tags_str)
 	var tags_arr []models.Tag
 	for _, ts := range tags_str_arr {
-		tags_arr = append(tags_arr, models.Tag{Title: ts})
+		tags_arr = append(tags_arr, publish.NewTag(ts))
 	}
 
 	// 尝试上传到对象存储和将元数据传到db中
