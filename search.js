@@ -4,9 +4,29 @@ function updateResults(results) {
 
     results.forEach(function (result) {
         var li = document.createElement('li');
-        li.textContent = `Title: ${result.title}, URL: ${result.url}, Tags: ${result.tags.join(', ')}`;
+        li.innerHTML = `Title: ${result.title}, Tags: ${result.tags.join(', ')}  <a onclick="DownloadRecord('${result.url}', '${result.title}')">DOWNLOAD</a>`;
         resultsList.appendChild(li);
     });
+}
+
+function DownloadRecord(url, filename) {
+    var token = getCookie("token")
+    fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }).then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.download = filename;
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(err => console.error('Download failed:', err));
 }
 
 
