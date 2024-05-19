@@ -87,13 +87,13 @@ header nav a {
     h2,
     h3,
     h4 {
-        margin-left: 8%;
-        margin-right: 8%;
+        margin-left: 4%;
+        margin-right: 4%;
     }
 
     p {
-        margin-left: 4%;
-        margin-right: 4%;
+        margin-left: 8%;
+        margin-right: 8%;
         text-indent: 2%;
     }
 }
@@ -101,3 +101,9 @@ header nav a {
 /* #content-container {
     left: 4%;
 } */
+
+.other-container {
+    margin-left: 3%;
+    margin-right: 3%;
+
+}
