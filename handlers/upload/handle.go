@@ -1,18 +1,24 @@
 package upload
 
 import (
-	"chatFileBackend/handlers/upload/utils"
+	"chatFileBackend/handlers/upload/upload_utils"
 	"chatFileBackend/models"
+	publish_utils "chatFileBackend/utils/publish/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func UploadHandler(c *gin.Context) {
-	// 获取header中的authentication
-	authHeader := c.GetHeader("authentication")
-	if authHeader == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "authentication header is required"})
+	// 发现context中的username
+	username_i, ok := c.Get("username")
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "fail to read username in request"})
+		return
+	}
+	username, ok := username_i.(string)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "fail in asserting username"})
 		return
 	}
 
@@ -38,19 +44,18 @@ func UploadHandler(c *gin.Context) {
 	}
 	defer fileContent.Close()
 
-	tags_str_arr := utils.Str2Tags(tags_str)
+	tags_str_arr := publish_utils.Str2Tags(tags_str)
 	var tags_arr []models.Tag
 	for _, ts := range tags_str_arr {
 		tags_arr = append(tags_arr, models.Tag{Title: ts})
 	}
 
 	// 尝试上传到对象存储和将元数据传到db中
-	_, err = utils.UploadFile(fileContent, models.MetaData{
-		Name:   file.Filename,
-		Size:   file.Size,
-		Tags:   tags_arr,
-		UserID: 1223, // 使用token找到目前的userid
-	})
+	_, err = upload_utils.UploadFile(fileContent, &models.MetaData{
+		Name:     file.Filename,
+		Size:     file.Size,
+		Tags:     tags_arr,
+		Username: username})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "could not create record"})
 		return

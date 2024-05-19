@@ -1,6 +1,7 @@
-package models
+package chats3
 
 import (
+	"chatFileBackend/models"
 	"context"
 	"fmt"
 	"io"
@@ -37,7 +38,7 @@ func (s3p S3Point) MakeBucket(bucket_name string) {
 	}
 }
 
-func (s3p S3Point) upload(bucket_name string, meta MetaData, file io.Reader) error {
+func (s3p S3Point) upload(bucket_name string, meta *models.MetaData, file io.Reader) error {
 	_, err := s3p.Point.PutObject(context.Background(), bucket_name,
 		meta.GenerateObjectName(),
 		file, meta.Size,
@@ -46,7 +47,7 @@ func (s3p S3Point) upload(bucket_name string, meta MetaData, file io.Reader) err
 }
 
 // 返回下载链接或者错误
-func (s3p S3Point) downloadURL(bucket_name string, meta MetaData) (string, error) {
+func (s3p S3Point) downloadURL(bucket_name string, meta *models.MetaData) (string, error) {
 	expires := time.Duration(1) * time.Hour // 链接有效时间，例如1小时
 
 	// 生成预签名的URL
@@ -69,7 +70,7 @@ func (s3p S3Point) downloadURL(bucket_name string, meta MetaData) (string, error
 }
 
 // 返回下载流或错误
-func (s3p S3Point) downloadReader(bucket_name string, meta MetaData) (io.Reader, error) {
+func (s3p S3Point) downloadReader(bucket_name string, meta models.MetaData) (io.Reader, error) {
 	reader, err := s3p.Point.GetObject(context.Background(), bucket_name,
 		meta.GenerateObjectName(), minio.GetObjectOptions{})
 	return reader, err

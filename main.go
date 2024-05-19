@@ -19,6 +19,7 @@ func main() {
 
 	routers.CreateAuthRouter(r)
 	routers.CreateSearchRouter(r)
+	routers.CreateUploadRouter(r)
 
 	r.Run("0.0.0.0:12800")
 }

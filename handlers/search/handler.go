@@ -1,8 +1,7 @@
 package search
 
 import (
-	search_utils "chatFileBackend/handlers/search/utils"
-	"fmt"
+	publish_utils "chatFileBackend/utils/publish/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,16 +34,16 @@ func SearchHandler(c *gin.Context) {
 	}
 
 	// 模拟搜索
-	var results []SearchResult
-	tags := search_utils.Str2Tags(tags_str)
+	tags := publish_utils.Str2Tags(tags_str)
+	var results []SearchResult = search(title_str, tags)
 
-	for i := 0; i < 100; i += 1 {
-		restmp := SearchResult{Title: title_str + fmt.Sprint(i),
-			URL:  "123.com",
-			Tags: tags}
+	// for i := 0; i < 100; i += 1 {
+	// 	restmp := SearchResult{Title: title_str + fmt.Sprint(i),
+	// 		URL:  "123.com",
+	// 		Tags: tags}
 
-		results = append(results, restmp)
-	}
+	// 	results = append(results, restmp)
+	// }
 	c.JSON(http.StatusOK, gin.H{
 		"results": results,
 		"message": "success"})

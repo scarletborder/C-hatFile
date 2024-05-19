@@ -1,20 +1,15 @@
-package utils
+package upload_utils
 
 import (
 	"chatFileBackend/models"
+	"chatFileBackend/utils/publish"
 	"io"
 )
 
 //  根据文件流和元数据创建db相关line和往对象存储中塞入数据
 
-func UploadFile(file io.Reader, meta models.MetaData) (msg string, err error) {
-	// 首先尝试塞入db
-
-	// 其次尝试对象存储
-
-	// 如果对象存储不行，删除db相关line
-
-	return "success", nil
+func UploadFile(file io.Reader, meta *models.MetaData) (msg string, err error) {
+	return publish.UploadDocument(file, meta)
 }
 
 /*

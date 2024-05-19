@@ -9,8 +9,8 @@ type MetaData struct {
 	ID         uint `gorm:"primaryKey;auto_increment;"`
 	Name       string
 	Size       int64
-	Tags       []Tag `gorm:"many2many:metadata_tags;"`
-	UserID     int64 // 上传用户qq号或其他形式的id
+	Tags       []Tag  `gorm:"many2many:metadata_tags;"`
+	Username   string // 上传用户qq号或其他形式的id
 	UploadTime *time.Time
 
 	Dirty bool `gorm:"-"` // 忽略这个字段，不写入数据库

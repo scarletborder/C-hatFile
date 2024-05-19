@@ -89,7 +89,7 @@ func init_handler(root_db *gorm.DB) {
 
 	err = grantHandler(root_db)
 	if err != nil {
-		logrus.Errorln("Error in grant permissions")
+		logrus.Errorln("Error in grant permissions " + auth_db_name)
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",

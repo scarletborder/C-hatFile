@@ -1,4 +1,4 @@
-package utils
+package publish_utils
 
 import (
 	"regexp"

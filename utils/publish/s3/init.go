@@ -1,7 +1,6 @@
-package upload
+package chats3
 
 import (
-	"chatFileBackend/models"
 	"encoding/json"
 	"os"
 
@@ -18,7 +17,7 @@ func init() {
 	// 初始化数据库和加入相关项目
 
 	// 初始化对象存储
-	cfg_content, err := os.ReadFile("Global/Storage/config.json")
+	cfg_content, err := os.ReadFile("utils/publish/config.json")
 	if err != nil {
 		logrus.Errorln("无法加载s3配置", err.Error())
 	}
@@ -32,7 +31,7 @@ func init() {
 			return
 		}
 
-		var pre_s3Points []models.S3Point
+		var pre_s3Points []S3Point
 		err = json.Unmarshal([]byte(value.String()), &pre_s3Points)
 		if err != nil {
 			logrus.Errorln("无法解析s3配置:节点信息", err.Error())
@@ -48,7 +47,7 @@ func init() {
 				logrus.Warningf("s3配置的第%v项(from 0)无法加载%v", idx, err.Error())
 			} else {
 				pre_s3Points[idx].Point = minioClient
-				s3Points = append(s3Points, pre_s3Points[idx])
+				s3points = append(s3points, pre_s3Points[idx])
 			}
 		}
 
@@ -62,7 +61,7 @@ func init() {
 			bucket_name = value.String()
 		}
 
-		for _, point := range s3Points {
+		for _, point := range s3points {
 			// 节点有效性下沉到上传和下载文件时再做
 			if !point.ExistBucket(bucket_name) {
 				point.MakeBucket(bucket_name)
