@@ -4,7 +4,6 @@ import (
 	auth_utils "chatFileBackend/handlers/auth/utils"
 	"chatFileBackend/models"
 	cached "chatFileBackend/utils/storage/cache"
-	"chatFileBackend/utils/storage/db"
 	"fmt"
 	"strconv"
 	"time"
@@ -84,7 +83,7 @@ func getEncPwd(username string) (enc_pwd string, level uint8) {
 		logrus.Warnln("无法从缓存中获取，Fallback至DB")
 	}
 	if !ok {
-		adb := db.Auth_db.GetDB()
+		adb := auth_utils.Auth_DB
 		adb.AutoMigrate(&models.User{})
 		adb.Where("username = ?", username).Take(&user)
 		cached.CacheSetByStr(cached.TypeAuthCache, &user)

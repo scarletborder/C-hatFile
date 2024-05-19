@@ -3,7 +3,6 @@ package auth
 import (
 	auth_utils "chatFileBackend/handlers/auth/utils"
 	"chatFileBackend/models"
-	"chatFileBackend/utils/storage/db"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -24,7 +23,7 @@ func RegisterHandler(c *gin.Context) {
 	}
 
 	// 检测是否有注册过的用户
-	adb := db.Auth_db.GetDB()
+	adb := auth_utils.Auth_DB
 
 	adb.AutoMigrate(&models.User{})
 

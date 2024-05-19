@@ -70,7 +70,3 @@ func generateRandomString(length int) (string, error) {
 	}
 	return string(result), nil
 }
-
-func GetDBUserName(DB_name string) string {
-	return "User_" + DB_name
-}

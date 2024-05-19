@@ -43,16 +43,16 @@ func ReadConfig() {
 
 			if field.Kind() == reflect.Struct {
 				// Update the User and Password fields
-				DB_nameField := field.FieldByName("DB_name")
+				UsernameField := field.FieldByName("Username")
 				passwordField := field.FieldByName("Password")
-				if DB_nameField.IsValid() && DB_nameField.String() == "" {
+				if UsernameField.IsValid() && UsernameField.String() == "" {
 					// 有相关条目但是没有初始化
 					pwd, err := generateRandomString(24)
 					if err != nil {
 						logrus.Errorln("无法为db生成随机密码，使用固定密码代替")
 						pwd = "sdf!SsoOjkb5j49FFXtrh05!"
 					}
-					DB_nameField.SetString(fieldName)
+					UsernameField.SetString(fieldName)
 					passwordField.SetString(pwd)
 				}
 			}

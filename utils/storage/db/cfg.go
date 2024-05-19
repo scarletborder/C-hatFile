@@ -6,21 +6,21 @@ import (
 
 // host
 type DBConfig struct {
-	SubDBCfgs SubDBConfigs `toml:"database"` // db名-验证用户，仅管理非客户
+	SubDBCfgs SubUserConfigs `toml:"database"` // db名-验证用户，仅管理非客户
 
 	Addr         string
 	RootUser     string `toml:"root_user"`
 	RootPassword string `toml:"root_password"`
 }
 
-type SubDBConfigs struct {
-	AuthDB       SubDBConfig `toml:"auth_db"`
-	FileReaderDB SubDBConfig `toml:"file_reader"`
-	FileWriterDB SubDBConfig `toml:"file_writer"`
+type SubUserConfigs struct {
+	AuthDB       SubUserConfig `toml:"auth_db"`
+	FileReaderDB SubUserConfig `toml:"file_reader"`
+	FileWriterDB SubUserConfig `toml:"file_writer"`
 }
 
-type SubDBConfig struct {
-	DB_name  string `toml:"DB_name"`
+type SubUserConfig struct {
+	Username string `toml:"Username"`
 	Password string
 }
 

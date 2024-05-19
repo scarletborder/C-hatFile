@@ -5,7 +5,11 @@ import (
 	cached "chatFileBackend/utils/storage/cache"
 	"crypto/sha256"
 	"fmt"
+
+	"gorm.io/gorm"
 )
+
+var Auth_DB *gorm.DB
 
 func Sha256Str(tok string) string {
 	// 创建一个新的SHA256哈希对象
