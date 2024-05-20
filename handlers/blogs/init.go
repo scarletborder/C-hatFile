@@ -17,7 +17,7 @@ var errMsg = ""
 var files []FileInfo
 var fileIndexMap map[string]int
 
-const directory = "/home/chatfile/blog_files"
+const directory = "blog_files"
 
 func init() {
 	daemon := time.NewTicker(10 * time.Minute)

@@ -16,7 +16,7 @@ func BlogPreviewHandler(c *gin.Context) {
 }
 
 func BlogGetHandler(c *gin.Context) {
-	title := c.Param("title")
+	title := c.Param("id")
 	content, err := GetBlogContent(title)
 
 	if err != nil {

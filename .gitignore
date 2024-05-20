@@ -9,3 +9,5 @@ config.*
 *.exe
 
 chatFileBackend.*
+
+blog_files/*
