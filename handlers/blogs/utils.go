@@ -16,7 +16,7 @@ func loadFiles(directory string) error {
 	fileIndexMap = make(map[string]int)
 	files = make([]FileInfo, 0)
 
-	for _, file := range fileInfo {
+	for idx, file := range fileInfo {
 		if !file.IsDir() {
 			filePath := filepath.Join(directory, file.Name())
 			fileStat, err := os.Stat(filePath)
@@ -26,6 +26,7 @@ func loadFiles(directory string) error {
 			files = append(files, FileInfo{
 				Name:       file.Name(),
 				CreateTime: fileStat.ModTime(),
+				ID:         idx,
 			})
 		}
 	}
