@@ -21,6 +21,15 @@ const directory = "/home/chatfile/blog_files"
 
 func init() {
 	daemon := time.NewTicker(10 * time.Minute)
+	err := loadFiles(directory)
+	if err != nil {
+		errMsg = fmt.Sprintf("Fail to read directory %s \n Time: %s",
+			err.Error(), time.Now().Format("2006-01-02 15:04:05"))
+		logrus.Errorf(errMsg)
+	} else {
+		errMsg = ""
+	}
+
 	go func() {
 		for range daemon.C {
 			err := loadFiles(directory)
