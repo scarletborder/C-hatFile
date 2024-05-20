@@ -16,7 +16,7 @@ func loadFiles(directory string) error {
 	fileIndexMap = make(map[string]int)
 	files = make([]FileInfo, 0)
 
-	for idx, file := range fileInfo {
+	for _, file := range fileInfo {
 		if !file.IsDir() {
 			filePath := filepath.Join(directory, file.Name())
 			fileStat, err := os.Stat(filePath)
@@ -26,7 +26,6 @@ func loadFiles(directory string) error {
 			files = append(files, FileInfo{
 				Name:       file.Name(),
 				CreateTime: fileStat.ModTime(),
-				ID:         idx,
 			})
 		}
 	}
@@ -36,9 +35,10 @@ func loadFiles(directory string) error {
 		return files[i].CreateTime.After(files[j].CreateTime)
 	})
 
-	for i, file := range files {
-		file.ID = i
-		fileIndexMap[file.Name] = i
+	leng := len(files)
+	for i := 0; i < leng; i += 1 {
+		files[i].ID = i
+		fileIndexMap[files[i].Name] = i
 	}
 
 	return nil
@@ -48,7 +48,8 @@ func loadFiles(directory string) error {
 // return files
 
 // 读取某个特定文件
-func GetBlogContent(fileID int) ([]byte, error) {
+func GetBlogContent(file_name string) ([]byte, error) {
+	fileID := fileIndexMap[file_name]
 	filePath := filepath.Join(directory, files[fileID].Name)
 	return os.ReadFile(filePath)
 }

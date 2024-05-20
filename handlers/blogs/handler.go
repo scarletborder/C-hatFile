@@ -2,7 +2,6 @@ package blogs
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,13 +16,8 @@ func BlogPreviewHandler(c *gin.Context) {
 }
 
 func BlogGetHandler(c *gin.Context) {
-	id := c.Param("id")
-	fileID, err := strconv.Atoi(id)
-	if err != nil || fileID < 0 || fileID >= len(files) {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid file ID"})
-		return
-	}
-	content, err := GetBlogContent(fileID)
+	title := c.Param("title")
+	content, err := GetBlogContent(title)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to read file"})
