@@ -13,8 +13,8 @@ var (
 	m         = new(sync.Mutex)
 
 	// time settings
-	Expired_time  = 5 * time.Minute
-	Sync_interval = 6 * time.Second
+	Expired_time  = 6 * time.Minute
+	Sync_interval = 5 * time.Second
 )
 
 type cachedItem interface {

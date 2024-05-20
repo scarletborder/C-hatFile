@@ -1,0 +1,12 @@
+{
+    "s3_points": [
+        {
+            "your-s3-endpoint-com": "10.131.57.35:9000",
+            "your-access-key": "admin",
+            "your-secret-key": "password",
+            "chunksize": 0,
+            "usessl": false
+        }
+    ],
+    "bucket_name": "cffiles"
+}

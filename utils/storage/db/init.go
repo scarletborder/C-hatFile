@@ -19,7 +19,7 @@ func init() {
 func ReadConfig() {
 	DBReadConfigWG.Add(1)
 	go func() {
-		const config_path = `utils\storage\db\config.toml`
+		const config_path = `utils/storage/db/config.toml`
 		// 异步加载文件配置
 		defer func() {
 			DBReadConfigWG.Done()
