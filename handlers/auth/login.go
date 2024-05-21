@@ -33,6 +33,7 @@ func LoginHandler(c *gin.Context) {
 			"message": "need arg encrypted_pwd"})
 		return
 	}
+	// 毫秒
 	time_stamp_str, ok := c.GetPostForm("time_stamp")
 	if !ok {
 		c.JSON(501, gin.H{
@@ -46,6 +47,11 @@ func LoginHandler(c *gin.Context) {
 		return
 
 	}
+
+	if int64(timestamp) < (time.Now().UnixNano()/int64(time.Millisecond))-10000 {
+		c.JSON(401, gin.H{"message": "timestamp submitted is too later than server > 10s!"})
+	}
+
 	if ok, lev := LoginVerify(username, enc2_pwd, timestamp); ok {
 		// 登录成功
 		token, exp_time, err := auth_utils.GenerateToken(username, enc2_pwd, lev)
