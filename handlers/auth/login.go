@@ -53,6 +53,8 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
+	_ = 1
+
 	if ok, lev := LoginVerify(username, enc2_pwd, timestamp); ok {
 		// 登录成功
 		token, exp_time, err := auth_utils.GenerateToken(username, enc2_pwd, lev)

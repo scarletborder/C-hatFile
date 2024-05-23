@@ -1,7 +1,10 @@
 package blogs
 
 import (
+	"chatFileBackend/utils/constant"
 	"fmt"
+
+	// "go/constant"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -13,11 +16,12 @@ type FileInfo struct {
 	CreateTime time.Time `json:"create_time"`
 }
 
-var errMsg = ""
-var files []FileInfo
-var fileIndexMap map[string]int
-
-const directory = "blog_files"
+var (
+	errMsg       = ""
+	files        []FileInfo
+	fileIndexMap map[string]int
+	directory    = constant.MiscCfg.BlogCfg.Dir_path
+)
 
 func init() {
 	daemon := time.NewTicker(10 * time.Minute)

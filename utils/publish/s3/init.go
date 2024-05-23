@@ -1,6 +1,7 @@
 package chats3
 
 import (
+	"chatFileBackend/utils/constant"
 	"chatFileBackend/utils/global"
 	"encoding/json"
 	"os"
@@ -21,7 +22,7 @@ func init() {
 	global.Init_count.Add(1)
 
 	go func() {
-		cfg_content, err := os.ReadFile("utils/publish/config.json")
+		cfg_content, err := os.ReadFile(constant.S3_config_path)
 		if err != nil {
 			logrus.Errorln("无法加载s3配置", err.Error())
 		}

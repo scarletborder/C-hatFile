@@ -1,5 +1,6 @@
 # all real config file
 config.*
+!config.go
 
 # all bak
 *.bak

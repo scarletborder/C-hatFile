@@ -1,6 +1,7 @@
 package db
 
 import (
+	"chatFileBackend/utils/constant"
 	"reflect"
 
 	"github.com/BurntSushi/toml"
@@ -19,7 +20,7 @@ func init() {
 func ReadConfig() {
 	DBReadConfigWG.Add(1)
 	go func() {
-		const config_path = `utils/storage/db/config.toml`
+		config_path := constant.Db_config_path
 		// 异步加载文件配置
 		defer func() {
 			DBReadConfigWG.Done()
