@@ -6,22 +6,24 @@ import (
 	"chatFileBackend/utils/publish"
 	publish_utils "chatFileBackend/utils/publish/utils"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func UploadHandler(c *gin.Context) {
 	// 发现context中的username
-	username_i, ok := c.Get("username")
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "fail to read username in request"})
-		return
-	}
-	username, ok := username_i.(string)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "fail in asserting username"})
-		return
-	}
+	// username_i, ok := c.Get("username")
+	uid := c.GetUint64("uid")
+	// if !ok {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"message": "fail to read username in request"})
+	// 	return
+	// }
+	// username, ok := username_i.(string)
+	// if !ok {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"message": "fail in asserting username"})
+	// 	return
+	// }
 
 	// debug
 	// bb, _ := io.ReadAll(c.Request.Body)
@@ -56,11 +58,13 @@ func UploadHandler(c *gin.Context) {
 	}
 
 	// 尝试上传到对象存储和将元数据传到db中
+	t := time.Now()
 	_, err = upload_utils.UploadFile(fileContent, &models.MetaData{
-		Name:     file.Filename,
-		Size:     file.Size,
-		Tags:     tags_arr,
-		Username: username})
+		Name:       file.Filename,
+		Size:       file.Size,
+		Tags:       tags_arr,
+		UploadTime: &t,
+		UserID:     uid})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "could not create record"})
 		return

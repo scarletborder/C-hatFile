@@ -27,3 +27,6 @@ func Sha256Str(tok string) string {
 func UpdateAccount(user *models.User) {
 	cached.CacheSetByStr(cached.TypeAuthCache, user)
 }
+
+// 获得context中的用户id
+// 通常是在用户登录后，每次请求带有token

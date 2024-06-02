@@ -46,6 +46,12 @@ func (s3p S3Point) upload(bucket_name string, meta *models.MetaData, file io.Rea
 	return err
 }
 
+func (s3p S3Point) delete(bucket_name string, meta *models.MetaData) error {
+	err := s3p.Point.RemoveObject(context.Background(), bucket_name, meta.GenerateObjectName(), minio.RemoveObjectOptions{})
+	logrus.Infof("delete file %s (err: %v)", meta.Name, err)
+	return err
+}
+
 // 返回下载链接或者错误
 func (s3p S3Point) downloadURL(bucket_name string, meta *models.MetaData) (string, error) {
 	expires := time.Duration(1) * time.Hour // 链接有效时间，例如1小时

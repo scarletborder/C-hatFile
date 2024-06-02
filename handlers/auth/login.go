@@ -55,9 +55,9 @@ func LoginHandler(c *gin.Context) {
 
 	_ = 1
 
-	if ok, lev := LoginVerify(username, enc2_pwd, timestamp); ok {
+	if lev, uid, ok := LoginVerify(username, enc2_pwd, timestamp); ok {
 		// 登录成功
-		token, exp_time, err := auth_utils.GenerateToken(username, enc2_pwd, lev)
+		token, exp_time, err := auth_utils.GenerateToken(username, enc2_pwd, lev, uid)
 		if err != nil {
 			c.JSON(500, gin.H{
 				"message": "Login succeed, but crash in generating token"})
@@ -75,14 +75,14 @@ func LoginHandler(c *gin.Context) {
 }
 
 // @param enc2_pwd 传来的经过sha256后拼接时间戳盐再sha256的结果
-func LoginVerify(username, enc2_pwd string, time_stamp int) (bool, uint8) {
-	real_enc_pwd, level := getEncPwd(username)
+func LoginVerify(username, enc2_pwd string, time_stamp int) (uint8, uint64, bool) {
+	real_enc_pwd, level, uid := getUserByName(username)
 	real_enc2_pwd := auth_utils.Sha256Str(real_enc_pwd + fmt.Sprint(time_stamp))
-	return real_enc2_pwd == enc2_pwd, level
+	return level, uid, real_enc2_pwd == enc2_pwd
 }
 
-// 获得一次sha256
-func getEncPwd(username string) (enc_pwd string, level uint8) {
+// 获得一次sha256和其他详细信息
+func getUserByName(username string) (enc_pwd string, level uint8, uid uint64) {
 	var user models.User
 	user.Username = username
 	user.FlushDirty()
@@ -96,9 +96,9 @@ func getEncPwd(username string) (enc_pwd string, level uint8) {
 		adb.AutoMigrate(&models.User{})
 		adb.Where("username = ?", username).Take(&user)
 		cached.CacheSetByStr(cached.TypeAuthCache, &user)
-		return user.Enc_password, user.Level
+		return user.Enc_password, user.Level, user.ID
 
 	} else {
-		return user.Enc_password, user.Level
+		return user.Enc_password, user.Level, user.ID
 	}
 }

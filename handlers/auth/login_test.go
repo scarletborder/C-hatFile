@@ -10,7 +10,7 @@ func TestLoginVerify(t *testing.T) {
 	enc2 := "71a120228ae52c477db27cc0dd1bd20a77b882b243f035d0c5c675e3eecc654b"
 	// password := "!!8964jss"
 
-	if ok, _ := auth.LoginVerify("xjp", enc2, timestamp); !ok {
+	if _, _, ok := auth.LoginVerify("xjp", enc2, timestamp); !ok {
 		t.Error("not equal, expected", enc2)
 	}
 }

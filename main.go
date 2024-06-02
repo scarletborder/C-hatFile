@@ -23,6 +23,7 @@ func main() {
 	routers.CreateDownloadRouter(r)
 	routers.CreateStatRouter(r)
 	routers.CreateBlogsRouter(r)
+	routers.CreateManagerRouter(r)
 
 	r.Run("0.0.0.0:12800")
 }

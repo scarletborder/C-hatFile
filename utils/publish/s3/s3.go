@@ -16,7 +16,7 @@ var (
 	bucket_name string
 )
 
-func Upload_file(reader io.Reader, meta *models.MetaData) (string, error) {
+func UploadFile(reader io.Reader, meta *models.MetaData) (string, error) {
 	for _, s3p := range s3points {
 		err := s3p.upload(bucket_name, meta, reader)
 		if err == nil {
@@ -25,6 +25,18 @@ func Upload_file(reader io.Reader, meta *models.MetaData) (string, error) {
 		logrus.Errorf("failed upload %v :%v", s3p.EndPoint, err.Error())
 	}
 	return "", errors.New("all s3points failed to upload file")
+}
+
+func DeleteFile(meta *models.MetaData) (string, error) {
+	// 在所有s3节点中尝试删除文件
+	succeed_num := 0
+	for _, s3p := range s3points {
+		err := s3p.delete(bucket_name, meta)
+		if err == nil {
+			succeed_num += 1
+		}
+	}
+	return fmt.Sprintf("successfully delete file in %d/%d points", succeed_num, len(s3points)), nil
 }
 
 func Get_download_url(meta *models.MetaData) (string, error) {

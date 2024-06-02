@@ -16,17 +16,16 @@ type Claims struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Level    uint8  `json:"level"` // 等级
+	Uid      uint64 `json:"uid"`
 	Jwt.StandardClaims
 }
 
-func GenerateToken(username, password string, level uint8) (string, time.Time, error) {
+func GenerateToken(username, password string, level uint8, uid uint64) (string, time.Time, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3 * time.Hour)
 
 	claims := Claims{
-		username,
-		password,
-		level,
+		username, password, level, uid,
 		Jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    "gin-blog",

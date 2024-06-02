@@ -16,7 +16,7 @@ func UploadDocument(file io.Reader, meta *models.MetaData) (msg string, err erro
 	}
 	// 其次尝试对象存储
 	metaID := meta.ID
-	msg, err = chats3.Upload_file(file, meta)
+	msg, err = chats3.UploadFile(file, meta)
 	if err != nil {
 		// 如果对象存储不行，删除db相关line
 		Writer_DB.Delete(&models.MetaData{}, metaID)

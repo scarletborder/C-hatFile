@@ -1,6 +1,11 @@
 # all real config file
 config.*
+db_config.toml
+misc_config.toml
+s3_config.json
+
 !config.go
+
 
 # all bak
 *.bak
