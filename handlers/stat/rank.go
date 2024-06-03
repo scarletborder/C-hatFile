@@ -44,6 +44,7 @@ func statRank() {
 		Group("user_id").Order("count desc").Limit(6).Find(&tmp_id_result)
 
 	rank_result = rank_result[:0]
+	Db.AutoMigrate(&models.User{})
 	for _, val := range tmp_id_result {
 		var tmp_user models.User
 		Db.First(&tmp_user, val.UserID)
