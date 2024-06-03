@@ -15,5 +15,6 @@ s3_config.json
 *.exe
 
 chatFileBackend.*
+chatFileBackend
 
 blog_files/*
