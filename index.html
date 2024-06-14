@@ -5,27 +5,27 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatFile</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/style.css">
 
 </head>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script>
-<script src="header.js"></script>
-<script src="login.js"></script>
 
 <body>
-    <div id="header-container"></div>
-    <div id="content-container">
+    <div id="header-container" class="container"></div>
+    <div id="content-container" class="container">
         <div class="txt_page">
             <h2>About this Website</h2>
             <p>ChatFile web</p>
-            <p>移植于作者同名的bot插件</p>
+            <p>移植于作者同名的bot插件，项目已经开源到<a href="https://github.com/scarletborder/ChatFile">github</a></p>
             <p>作者:scarletborder</p>
+<h3>update</h3>
+<p>2024/6/2:更新了manager功能</p>
         </div>
-
-
     </div>
 
+    <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/header.js"></script>
+    <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/login.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             loadHeader();
@@ -38,12 +38,16 @@
                     document.getElementById('header-container').innerHTML = html;
                     // 初始化header中可能需要的任何JavaScript
                     // initializeHeader();
+                    checkLoginStatus()
                 })
                 .catch(error => {
-                    console.error('Failed to load the header:', error);
+                    console.error(`Failed to load the header: ${error}`);
+                    alert(`Failed to load the header: ${error}`)
                 });
         }
     </script>
+
+
 </body>
 
 </html>

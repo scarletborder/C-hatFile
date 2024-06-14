@@ -1,0 +1,333 @@
+<!doctype html>
+<html style='font-size:18px !important'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width initial-scale=1'>
+
+    </style>
+    <link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/style.css">
+    <title>从0安装chatfile</title>
+</head>
+
+<body class='typora-export os-windows'>
+    <div class='typora-export-content'>
+        <div id='write' class=''>
+            <h1 id='从0安装chatfile'><span>从0安装Chatfile</span></h1>
+            <h2 id='前言'><span>前言</span></h2>
+            <p><span>写这篇文章目的记录在新机器上安装一些必要的依赖的过程，同时充当实验步骤</span></p>
+            <h2 id='前置'><span>前置</span></h2>
+            <ul>
+                <li>
+                    <p><span>mysql</span></p>
+                    <ul>
+                        <li>
+                            <p><span>安装mysql软件</span></p>
+                            <ul>
+                                <li>
+                                    <p><code>sudo apt update</code></p>
+                                </li>
+                                <li>
+                                    <p><code>sudo apt install mysql-server</code></p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p><span>将root账号auth_socket修改为密码登录，这一步也可以创建一个权限相当于root的账户不过是密码登录的方式也可以</span></p>
+                            <ul>
+                                <li>
+                                    <blockquote>
+                                        <p><a href='https://cloud.tencent.com/developer/article/2175351'><span>【说站】MySQL8.0配置mysql_native_password方法教程-腾讯云开发者社区-腾讯云
+                                                    (tencent.com)</span></a></p>
+                                        <p><code>ALTER USER &#39;root&#39;@&#39;localhost&#39; IDENTIFIED WITH mysql_native_password BY &#39;YourPassword&#39;;</code>
+                                        </p>
+                                        <p><code>FLUSH PRIVILEGES;</code></p>
+                                    </blockquote>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><span>screen</span></p>
+                    <ul>
+                        <li>
+                            <p><code>apt install screen</code></p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><span>golang</span></p>
+                    <ul>
+                        <li>
+                            <p><span>官方教程写的安装教程很详细</span></p>
+                        </li>
+                        <li>
+                            <p><a href='https://go.dev/doc/install'><span>Download and install - The Go Programming
+                                        Language</span></a></p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><span>minio</span></p>
+                    <ul>
+                        <li>
+                            <p><span>根据官方安装教程</span><a
+                                    href='https://min.io/download?license=agpl&amp;platform=linux'><span>MinIO | Code
+                                        and downloads to create high performance object storage</span></a></p>
+                        </li>
+                        <li>
+                            <blockquote>
+                                <p><span>启动前修改密码</span></p>
+                                <p><span>export MINIO_ROOT_USER=admin export MINIO_ROOT_PASSWORD=12345678</span></p>
+                            </blockquote>
+                        </li>
+                        <li>
+                            <p><span>启动</span><code>./minio server /mnt/data --console-address &quot;:9001&quot;</code>
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><span>nginx</span></p>
+                    <ul>
+                        <li>
+                            <p><code>sudo apt install nginx</code></p>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h2 id='获取chatfile软件'><span>获取chatfile软件</span></h2>
+            <p><span>将服务端的ssh公钥上传给github setting</span></p>
+            <p><span>从git上获取软件</span></p>
+            <p><code>git clone git@github.com:scarletborder/chatfile-backend.git</code></p>
+            <p>&nbsp;</p>
+            <h2 id='修改配置'><span>修改配置</span></h2>
+            <h3 id='chatfile软件'><span>chatfile软件</span></h3>
+            <p><span>chatfile共有两处配置项</span></p>
+            <ul>
+                <li>
+                    <p><code>utils/storage/db/config copy.toml</code><span>修改对于数据库root或具有相同权限的认证方式，并将配置文件名改为</span><code>config.toml</code>
+                    </p>
+                </li>
+                <li>
+                    <p><code>utils/publish/config copy.json</code><span>修改S3节点的配置，可自建或者使用第三方服务提供商的节点信息。支持设置多个节点，软件调用时依次调用，请保持随时可用。并将配置文件名改为</span><code>config.json</code>
+                    </p>
+                </li>
+            </ul>
+            <h3 id='你的dsn提供商'><span>你的dsn提供商</span></h3>
+            <p><span>这里笔者使用cloudflare，添加一条A记录</span></p>
+            <p><img src="https://s2.loli.net/2024/05/20/AvFtCn268BjsY5q.png" referrerpolicy="no-referrer"
+                    alt="image-20240520123614123"></p>
+            <h3 id='nginx'><span>nginx</span></h3>
+            <p><span>要点在于修改client_max_body_size，创建一个新的server</span></p>
+            <p><span>你需要设置你的域名，并保持开放80端口。</span></p>
+            <pre class="md-fences md-end-block md-fences-with-lineno ty-contain-cm modeLoaded" spellcheck="false"
+                lang=""
+                style="break-inside: unset;"><div class="CodeMirror cm-s-inner cm-s-null-scroll CodeMirror-wrap" lang=""><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 10.9557px; left: 46.9922px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 39px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><span><span>​</span>x</span></div><div class="CodeMirror-measure"></div><div style="position: relative; z-index: 1;"></div><div class="CodeMirror-code" role="presentation" style=""><div class="CodeMirror-activeline" style="position: relative;"><div class="CodeMirror-activeline-background CodeMirror-linebackground"></div><div class="CodeMirror-gutter-background CodeMirror-activeline-gutter" style="left: -38.9974px; width: 39px;"></div><div class="CodeMirror-gutter-wrapper CodeMirror-activeline-gutter" style="left: -38.9974px;"><div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show" style="left: 0px; width: 30px;">1</div></div><pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;">server {</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">2</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  listen 80;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">3</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  server_name share.scarletborders.top;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">4</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">5</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  location /api/{</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">6</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  proxy_pass http://localhost:12800/;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">7</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  }</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">8</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  #charset koi8-r;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">9</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                    style="left: 0px; width: 30px;">10</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  #access_log  logs/host.access.log  main;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">11</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">12</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  location / {</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">13</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  root &nbsp; html;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">14</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  index  index.html index.htm;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">15</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  }</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">16</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">17</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  #error_page  404 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  /404.html;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">18</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">19</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  # redirect server error pages to the static page /50x.html</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                    style="left: 0px; width: 30px;">20</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  #</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">21</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  error_page &nbsp; 500 502 503 504  /50x.html;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">22</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  location = /50x.html {</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">23</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  root &nbsp; html;</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">24</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  }</span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">25</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 30px;">26</div>
+            </div>
+            <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+        </div>
+        <div style="position: relative;">
+            <div class="CodeMirror-gutter-wrapper" style="left: -38.9974px;">
+                <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                    style="left: 0px; width: 30px;">27</div>
+            </div>
+            <pre class=" CodeMirror-line "
+                role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  }</span></pre>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <div style="position: absolute; height: 0px; width: 1px; border-bottom: 0px solid transparent; top: 700px;"></div>
+    <div class="CodeMirror-gutters" style="height: 700px;">
+        <div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 38px;"></div>
+    </div>
+    </div>
+    </div>
+    </pre>
+    <h2 id='大功告成'><span>大功告成</span></h2>
+    <p><span>现在可以通过访问</span><a href='https://share.scarletborders.top/'><span>ChatFile
+                (scarletborders.top)</span></a><span>来连接web前端。</span></p>
+    </div>
+    </div>
+</body>
+
+</html>

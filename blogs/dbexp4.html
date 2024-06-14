@@ -1,0 +1,245 @@
+<!doctype html>
+<html style='font-size:18px !important'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width initial-scale=1'>
+    <title>dbexp4</title>
+</head>
+
+<body class='typora-export os-windows'>
+    <div class='typora-export-content'>
+        <div id='write' class=''>
+            <h1 id='数据库第4次实验'><span>数据库第4次实验</span></h1>
+            <p><span>贾松儒 2022302181108</span></p>
+            <h2 id='前言'><span>前言</span></h2>
+            <p><span>本次实验产物来源于笔者先前已经开始着手编写的同名bot插件，但是原先的插件功能较少仅有直接的上传、查询和下载功能。部分功能与预签名相挂钩，存在被刷OSS资源的风险，并且没有任何权限控制。代码结构为适应bot框架，牺牲了拓展性。</span>
+            </p>
+            <p><span>由此笔者借助此次实验任务机会重构代码，增加许多特性。</span></p>
+            <h3 id='技术栈总结'><span>技术栈总结</span></h3>
+            <blockquote>
+                <p><span>后端:golang</span></p>
+                <p><span>前端:原生html javascript</span></p>
+                <p><span>数据库:mysql</span></p>
+                <p><span>文件存储：minio OSS</span></p>
+                <p><span>中间件:</span></p>
+                <ul>
+                    <li>
+                        <p><span>鉴权jwt</span></p>
+                    </li>
+                    <li>
+                        <p><span>缓存&quot;github.com/patrickmn/go-cache&quot;</span></p>
+                    </li>
+                </ul>
+            </blockquote>
+            <h3 id='时间'><span>时间</span></h3>
+            <p><span>backend:</span><a
+                    href="https://wakatime.com/badge/user/306f2016-648f-4ed3-822c-e9d658a056c8/project/7cb55a83-b653-45ec-b524-4fbe27aa2325"><img
+                        src="https://wakatime.com/badge/user/306f2016-648f-4ed3-822c-e9d658a056c8/project/7cb55a83-b653-45ec-b524-4fbe27aa2325.svg"
+                        alt="wakatime"></a></p>
+            <p><span>frontend:</span><a
+                    href="https://wakatime.com/badge/user/306f2016-648f-4ed3-822c-e9d658a056c8/project/626d213b-10ef-4773-8393-24b0b2b5196e"><img
+                        src="https://wakatime.com/badge/user/306f2016-648f-4ed3-822c-e9d658a056c8/project/626d213b-10ef-4773-8393-24b0b2b5196e.svg"
+                        alt="wakatime"></a></p>
+            <p><span>服务前身-绯小晶bot:</span><a
+                    href="https://wakatime.com/badge/user/306f2016-648f-4ed3-822c-e9d658a056c8/project/018e148b-4243-47c1-a8c0-ef2806942d50"><img
+                        src="https://wakatime.com/badge/user/306f2016-648f-4ed3-822c-e9d658a056c8/project/018e148b-4243-47c1-a8c0-ef2806942d50.svg"
+                        alt="wakatime"></a></p>
+            <h2 id='实验内容'><span>实验内容</span></h2>
+            <blockquote>
+                <p><span>1.对系统进行需求分析，主要针对数据库进行需求分析，可以采用数据流图、数</span>
+                    <span>据字典等方式。</span>
+                </p>
+            </blockquote>
+            <h3 id='需求分析'><span>需求分析</span></h3>
+            <p><span>实现注册、登录、上传、下载以及其他增强功能。</span></p>
+            <h3 id='部分数字字典和数据流定义'><span>部分数字字典和数据流定义</span></h3>
+            <ol>
+                <li>
+                    <p><strong><span>用户类型</span></strong></p>
+                    <ul>
+                        <li>
+                            <p><strong><span>类型</span></strong><span>：复合数据类型</span></p>
+                        </li>
+                        <li>
+                            <p><strong><span>属性</span></strong><span>：</span></p>
+                            <ul>
+                                <li>
+                                    <p><span>用户ID：uint64，在数据库中作为主键，唯一标识符</span></p>
+                                </li>
+                                <li>
+                                    <p><span>用户名：字符串</span></p>
+                                </li>
+                                <li>
+                                    <p><span>加密密码：字符串，用户的密码经过一次sha256加密</span></p>
+                                </li>
+                                <li>
+                                    <p><span>权限等级：uint8</span></p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p><strong><span>描述</span></strong><span>：区分用户和定义用户的权限级别。</span></p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong><span>文件</span></strong></p>
+                    <ul>
+                        <li>
+                            <p><strong><span>类型</span></strong><span>：复合数据类型</span></p>
+                        </li>
+                        <li>
+                            <p><strong><span>属性</span></strong><span>：</span></p>
+                            <ul>
+                                <li>
+                                    <p><span>文件ID：uint64，在数据库中作为主键，唯一标识符</span></p>
+                                </li>
+                                <li>
+                                    <p><span>文件标题：字符串</span></p>
+                                </li>
+                                <li>
+                                    <p><span>文件大小：int64</span></p>
+                                </li>
+                                <li>
+                                    <p><span>文件标签：标签数组</span></p>
+                                </li>
+                                <li>
+                                    <p><span>上传者用户Username：区分上传用户</span></p>
+                                </li>
+                                <li>
+                                    <p><span>上传时间：golang time.time类型</span></p>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <p><strong><span>描述</span></strong><span>：在系统中上传和查询的文件详情。</span></p>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+            <ol start='3'>
+                <li>
+                    <p><strong><span>Search请求数据流</span></strong></p>
+                    <ul>
+                        <li>
+                            <p><strong><span>包含</span></strong><span>：文件标题、文件标签、验证头</span></p>
+                        </li>
+                        <li>
+                            <p><strong><span>描述</span></strong><span>：用户查询文件时提供的数据。</span></p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p><strong><span>Upload请求数据流</span></strong></p>
+                    <ul>
+                        <li>
+                            <p><strong><span>包含</span></strong><span>：文件标签、文件、验证头</span></p>
+                        </li>
+                        <li>
+                            <p><strong><span>描述</span></strong><span>：用户上传文件时提供的数据。</span></p>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+            <ol start='5'>
+                <li>
+                    <p><strong><span>Top统计数据流</span></strong></p>
+                    <ul>
+                        <li>
+                            <p><span>描述：查询最近一次统计时，用户上传数据排名。</span></p>
+                        </li>
+                    </ul>
+                    <p>&nbsp;</p>
+                </li>
+            </ol>
+            <blockquote>
+                <p><span>2.对系统和数据库进行设计，根据需求分析的有关内容，画出系统的 E-R 图，并</span>
+                    <span>据此设计对应的数据库表结构，然后对系统进行简单范式分析等。</span>
+                </p>
+            </blockquote>
+            <h3 id='e-r图'><span>E-R图</span></h3>
+            <p><code>auth_db</code></p>
+            <p><img src="https://s2.loli.net/2024/05/19/ybDtBM4IarQ6Yuc.png" referrerpolicy="no-referrer"
+                    alt="image-20240519200544528"></p>
+            <p><code>fs_storage</code></p>
+            <p><img src="https://s2.loli.net/2024/05/19/5gpVzG24FiSCDTJ.png" referrerpolicy="no-referrer"
+                    alt="image-20240519200609548"></p>
+            <p><span>使用逻辑外键替换物理外键。</span></p>
+            <p><span>实际上tags many to many meta_data。</span></p>
+            <blockquote>
+                <p><span>3.设计实现一个数据库应用系统，Web、App 等皆可，数据库、语言、平台、框架等可自选，推荐使用 Linux+Apache+PHP+Mysql。有如下要求：</span>
+                    <span>1）用户登录，至少两种不同类型的用户权限访问控制；</span>
+                    <span>2）用户口令哈希存储；</span>
+                    <span>3）体现数据库完整性检查；</span>
+                    <span>4）体现防 SQL 注入；</span>
+                    <span>5）进行系统并发测试；</span>
+                    <span>6）具有数据备份与恢复功能。</span>
+                </p>
+            </blockquote>
+            <h3 id='部分设计'><span>部分设计</span></h3>
+            <h4 id='用户权限控制'><span>用户权限控制</span></h4>
+            <p><span>在数据库控制层面，按照功能的区分分为</span><code>root</code><span> </span><code>auth_db</code><span>
+                </span><code>file_reader</code><span> </span><code>file_writer</code><span>。</span></p>
+            <p><span>软件第一次启动时会创建相关数据库账户并使用配置文件中定义的</span><code>root</code><span>用户为他们赋权。其中：</span></p>
+            <ul>
+                <li>
+                    <p><code>auth_db</code><span>：拥有同名数据库</span><code>auth_db</code><span>的</span><code>CREATE, SELECT, INSERT, UPDATE, DELETE, ALTER, INDEX, EXECUTE</code><span>权限</span>
+                    </p>
+                </li>
+                <li>
+                    <p><code>file_reader</code><span>：拥有数据库</span><code>fs_storage</code><span>的</span><code>CREATE, SELECT, INSERT, UPDATE, DELETE, ALTER, INDEX, EXECUTE</code><span>权限</span>
+                    </p>
+                </li>
+                <li>
+                    <p><code>file_writer</code><span>：拥有数据库</span><code>fs_storage</code><span>的</span><code>CREATE, SELECT, ALTER, INDEX, EXECUTE</code><span>权限</span>
+                    </p>
+                </li>
+            </ul>
+            <p><span>如果目前数据库中不存在指定的数据库和账户，软件会自动创建他们，除root外每个账户的密码为随机25位字符串。</span></p>
+            <p>&nbsp;</p>
+            <p><span>在服务端验证用户方面，根据用户的</span><code>level</code><span>不同，拥有不同的管理权限。</span></p>
+            <h3 id='用户口令哈希存储'><span>用户口令哈希存储</span></h3>
+            <p><span>注册时，在前端使用sha256算法计算用户密码哈希值，和用户名一同填写表单发给服务端，服务端记录到缓存中(定时和数据库同步)。</span></p>
+            <p><span>登录时，前端使用sha256算法加密用户密码，再和当前时间戳合并再进行第二次加密，和用户名一同填写表单发给服务端，服务端验证成功后会签名并发回一个具有一定有效期的token。前端会存储这个token直到过期或者手动删除cookie。</span>
+            </p>
+            <h3 id='数据库完整性检查'><span>数据库完整性检查</span></h3>
+            <p><span>使用</span><code>gorm</code><span>，根据定义的数据模型自动迁移以保证数据库完整性。</span></p>
+            <h3 id='防sql注入'><span>防SQL注入</span></h3>
+            <p><span>使用</span><code>gorm</code><span>，在查询等场景使用占位符，避免字符串拼接。 </span></p>
+            <h3 id='系统并发测试'><span>系统并发测试</span></h3>
+            <p><span>10k次query请求共132.83653秒</span></p>
+            <p><img src="https://s2.loli.net/2024/05/19/vtGydTwYRhkFfru.png" referrerpolicy="no-referrer"
+                    alt="image-20240519202926355"></p>
+            <h3 id='数据备份与恢复'><span>数据备份与恢复</span></h3>
+            <ul>
+                <li>
+                    <p><span>缓存(go-cache)-数据库(mysql)二层架构，定时将缓存中脏数据写回数据库。</span></p>
+                </li>
+            </ul>
+            <ul>
+                <li>
+                    <p><span>使用</span><code>gorm</code><span>的默认事务，写入后自动同步数据库。</span></p>
+                </li>
+            </ul>
+            <p>&nbsp;</p>
+            <h2 id='示例截图'><span>示例截图</span></h2>
+            <h3 id='pc视图'><span>PC视图</span></h3>
+            <p><img src="https://s2.loli.net/2024/05/19/ioYQEblFOc3NRjT.png" referrerpolicy="no-referrer" alt="1"></p>
+            <p><img src="https://s2.loli.net/2024/05/19/ubrYgjWROUts62F.png" referrerpolicy="no-referrer" alt="2"></p>
+            <p><img src="https://s2.loli.net/2024/05/19/SuzOKMWQ9ZbmCsU.png" referrerpolicy="no-referrer" alt="3"></p>
+            <p><img src="https://s2.loli.net/2024/05/19/HauFQTJpG9tU1vK.jpg" referrerpolicy="no-referrer" alt="4"></p>
+            <h3 id='移动视图夜间模式'><span>移动视图(夜间模式)</span></h3>
+            <p><img src="https://s2.loli.net/2024/05/19/52VM1qCInDaA8XQ.png" referrerpolicy="no-referrer"
+                    alt="188857bfabd5cc507434854ab64d44d0"></p>
+            <p><img src="https://s2.loli.net/2024/05/19/2Eq9yM6lNVAWgxu.jpg" referrerpolicy="no-referrer"
+                    alt="2106994b8251d795ddfaa35d390ea33e"></p>
+            <p><img src="https://s2.loli.net/2024/05/19/eX4bwP1o5iJItzL.jpg" referrerpolicy="no-referrer"
+                    alt="73c23b200de3251bdf5b4cea176d6be4"></p>
+            <p><img src="https://s2.loli.net/2024/05/19/tFuWEmVUiJ6eXZg.jpg" referrerpolicy="no-referrer"
+                    alt="50a7a92b7c9c24acfa14b539be7dc93d"></p>
+        </div>
+    </div>
+</body>
+
+</html>

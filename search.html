@@ -4,19 +4,17 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search|ChatFile</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/style.css">
 
 </head>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script>
-<script src="header.js"></script>
-<script src="login.js"></script>
-<script src="search.js"></script>
+<script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/search.js"></script>
 
 <body>
-    <div id="header-container"></div>
-    <div id="content-container">
+    <div id="header-container" class="container"></div>
+    <div id="content-container" class="container">
         <div class="txt_page">
             <h2>Search</h2>
             <p>You can query resources by their partial title or partial tags.</p>
@@ -36,6 +34,8 @@
     </div>
 
 
+    <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/header.js"></script>
+    <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/login.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             loadHeader();
@@ -48,9 +48,11 @@
                     document.getElementById('header-container').innerHTML = html;
                     // 初始化header中可能需要的任何JavaScript
                     // initializeHeader();
+                    checkLoginStatus()
                 })
                 .catch(error => {
-                    console.error('Failed to load the header:', error);
+                    console.error(`Failed to load the header: ${error}`);
+                    alert(`Failed to load the header: ${error}`)
                 });
         }
     </script>

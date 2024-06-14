@@ -2,39 +2,32 @@
 <html>
 
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload|ChatFile</title>
+    <title>Manager | ChatFile</title>
     <link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/style.css">
 
 </head>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.js"></script>
 
-
-
 <body>
     <div id="header-container" class="container"></div>
     <div id="content-container" class="container">
         <div class="txt_page">
-            <h2>Upload</h2>
-            <p>Choose file you want to send.</p>
-        </div>
-
-        <div class="other-container">
-            <form id="uploadForm">
-                <input type="file" id="fileInput" name="file" placeholder="file">
-                <input type="text" id="textInput" name="text" placeholder="tags">
-                <button type="submit">Upload</button>
-            </form>
-
+            <h2>File Manager</h2>
+            <p>Here displays files you upload, you could delete them whenever you want</p>
+            <div id="self_view"></div>
         </div>
     </div>
 
     <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/header.js"></script>
     <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/login.js"></script>
+    <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/manager.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             loadHeader();
+            GetSelfView();
         });
 
         function loadHeader() {
@@ -51,8 +44,10 @@
                     alert(`Failed to load the header: ${error}`)
                 });
         }
+
     </script>
+
+
 </body>
-<script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/upload.js"></script>
 
 </html>

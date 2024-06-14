@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOP|ChatFile</title>
+    <title>ChatFile</title>
     <link rel="stylesheet" type="text/css" href="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/style.css">
 
 </head>
@@ -15,14 +15,14 @@
     <div id="header-container" class="container"></div>
     <div id="content-container" class="container">
         <div class="txt_page">
-            <h2>TOP</h2>
-            <p>This page shows the top of contributors.</p>
-            <p>Result will refresh every 12 hours</p>
-        </div>
+            <h2>Blogs</h2>
+            <p>这里记录一些博文</p>
 
-        <div class="txt_page" id="contributors" class="other-container">
+            <ul id="fileList" class="file-list"></ul>
+            <div id="fileContent" class="file-content"></div>
         </div>
     </div>
+
     <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/header.js"></script>
     <script src="https://gcore.jsdelivr.net/npm/chatfilefront@1.0.8/login.js"></script>
     <script>
@@ -44,31 +44,40 @@
                     alert(`Failed to load the header: ${error}`)
                 });
         }
-
-        // 请求contributors rank
-        fetch("/api/stat/rank", {
-            method: 'GET'
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        }).then(data => {
-            let last_time = new Date((data.stamp ? data.stamp : 19999999999));
-            let res = `<p>上次刷新${last_time.toString()}</p>`;
-            var results = data.results;
-            if (!results) {
-                alert("No results");
-                return;
-            }
-            for (let value of results) {
-                res += `<li> ${value.name} 上传了 ${value.number} 份文件</li>`
-            }
-            document.getElementById("contributors").innerHTML = res;
-        })
-
     </script>
+    <script>
+        async function fetchFiles() {
+            const response = await fetch('/api/blogs');
+            const files = (await response.json());
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
 
+            files.data.forEach(file => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = `#${file.name}`;
+                link.textContent = `${file.name} (${new Date(file.create_time).toLocaleString()})`;
+                link.onclick = () => loadFileContent(file.name);
+                listItem.appendChild(link);
+                fileList.appendChild(listItem);
+            });
+        }
+
+        async function loadFileContent(title) {
+            const response = await fetch(`/api/blogs/${title}`);
+            const content = await response.text();
+            const fileContent = document.getElementById('fileContent');
+            fileContent.innerHTML = content;
+        }
+
+        window.onload = () => {
+            fetchFiles();
+            if (window.location.hash) {
+                const fileId = window.location.hash.substring(1);
+                loadFileContent(fileId);
+            }
+        };
+    </script>
 
 </body>
 
